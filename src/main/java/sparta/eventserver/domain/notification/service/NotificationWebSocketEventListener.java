@@ -5,11 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import sparta.eventserver.domain.notification.dto.response.NotificationListResponse;
+import sparta.eventserver.global.security.CustomUserDetails;
 
 @Slf4j
 @Component
@@ -45,15 +47,15 @@ public class NotificationWebSocketEventListener {
         try {
             Long pathUserId = Long.parseLong(destination.substring(NOTIFICATION_TOPIC_PREFIX.length()));
 
-//            if (!(accessor.getUser() instanceof Authentication auth)
-//                    || !(auth.getPrincipal() instanceof CustomUserDetails userDetails)) {
-//                log.warn("알림 구독 인증 정보 없음: destination={}", destination);
-//                return;
-//            }
-//            if (!userDetails.getUserId().equals(pathUserId)) {
-//                log.warn("알림 구독 userId 불일치: authUserId={}, destination={}", userDetails.getUserId(), destination);
-//                return;
-//            }
+            if (!(accessor.getUser() instanceof Authentication auth)
+                    || !(auth.getPrincipal() instanceof CustomUserDetails userDetails)) {
+                log.warn("알림 구독 인증 정보 없음: destination={}", destination);
+                return;
+            }
+            if (!userDetails.getUserId().equals(pathUserId)) {
+                log.warn("알림 구독 userId 불일치: authUserId={}, destination={}", userDetails.getUserId(), destination);
+                return;
+            }
 
             NotificationListResponse pending = notificationQueryService.getNotifications(pathUserId, null);
             messagingTemplate.convertAndSend(destination, pending);

@@ -46,26 +46,4 @@ public class User extends BaseEntity {
     @Column(name = "is_bid_blocked", nullable = false)
     @Builder.Default
     private boolean isBidBlocked = false;
-
-    public void updateProfile(String nickname, String phone, String address) {
-        this.nickname = nickname;
-        this.phone = phone;
-        this.address = address;
-    }
-
-    public void registerBillingKey(String billingKey) {
-        this.billingKey = billingKey;
-    }
-
-    public void deleteBillingKey() {
-        this.billingKey = null;
-    }
-
-    public void block() {
-        this.isBidBlocked = true;
-    }
-
-    public void unblock() {
-        this.isBidBlocked = false;
-    }
 }
