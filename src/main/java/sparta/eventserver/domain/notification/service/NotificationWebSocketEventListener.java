@@ -6,6 +6,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionConnectedEvent;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import sparta.eventserver.domain.notification.dto.response.NotificationListResponse;
 
 @Slf4j
@@ -15,33 +18,33 @@ public class NotificationWebSocketEventListener {
 
     private static final String NOTIFICATION_TOPIC_PREFIX = "/sub/notifications/";
 
-    //    private final SimpMessagingTemplate messagingTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
     private final NotificationQueryService notificationQueryService;
-//
-//
-//    // WebSocket 연결
-//    // /ws 로 연결 요청이 들어오면 스프링이 자동으로 SessionConnectedEvent 발행
-//    @EventListener
-//    public void handleConnect(SessionConnectedEvent event) {
-//        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-//        log.debug("WebSocket 연결: sessionId={}", accessor.getSessionId());
-//    }
-//
-//
-//    // 실시간 알림 수신 구독 — 구독 즉시 미읽음 알림 전송
-//    // /sub 으로 연결 요청이 들어오면 스프링이 자동으로 SessionSubscribeEvent 발행
-//    @EventListener
-//    public void handleSubscribe(SessionSubscribeEvent event) {
-//        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-//        String destination = accessor.getDestination();
-//
-//        if (destination == null || !destination.startsWith(NOTIFICATION_TOPIC_PREFIX)) {
-//            return;
-//        }
-//
-//        try {
-//            Long pathUserId = Long.parseLong(destination.substring(NOTIFICATION_TOPIC_PREFIX.length()));
-//
+
+
+    // WebSocket 연결
+    // /ws 로 연결 요청이 들어오면 스프링이 자동으로 SessionConnectedEvent 발행
+    @EventListener
+    public void handleConnect(SessionConnectedEvent event) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        log.debug("WebSocket 연결: sessionId={}", accessor.getSessionId());
+    }
+
+
+    // 실시간 알림 수신 구독 — 구독 즉시 미읽음 알림 전송
+    // /sub 으로 연결 요청이 들어오면 스프링이 자동으로 SessionSubscribeEvent 발행
+    @EventListener
+    public void handleSubscribe(SessionSubscribeEvent event) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        String destination = accessor.getDestination();
+
+        if (destination == null || !destination.startsWith(NOTIFICATION_TOPIC_PREFIX)) {
+            return;
+        }
+
+        try {
+            Long pathUserId = Long.parseLong(destination.substring(NOTIFICATION_TOPIC_PREFIX.length()));
+
 //            if (!(accessor.getUser() instanceof Authentication auth)
 //                    || !(auth.getPrincipal() instanceof CustomUserDetails userDetails)) {
 //                log.warn("알림 구독 인증 정보 없음: destination={}", destination);
@@ -51,17 +54,17 @@ public class NotificationWebSocketEventListener {
 //                log.warn("알림 구독 userId 불일치: authUserId={}, destination={}", userDetails.getUserId(), destination);
 //                return;
 //            }
-//
-//            NotificationListResponse pending = notificationQueryService.getNotifications(pathUserId, null);
-//            messagingTemplate.convertAndSend(destination, pending);
-//        } catch (NumberFormatException e) {
-//            log.warn("알림 구독 경로에서 userId 파싱 실패: destination={}", destination);
-//        }
-//    }
-//
-//    // WebSocket 연결 해제
-//    @EventListener
-//    public void handleDisconnect(SessionDisconnectEvent event) {
-//        log.debug("WebSocket 연결 해제: sessionId={}", event.getSessionId());
-//    }
+
+            NotificationListResponse pending = notificationQueryService.getNotifications(pathUserId, null);
+            messagingTemplate.convertAndSend(destination, pending);
+        } catch (NumberFormatException e) {
+            log.warn("알림 구독 경로에서 userId 파싱 실패: destination={}", destination);
+        }
+    }
+
+    // WebSocket 연결 해제
+    @EventListener
+    public void handleDisconnect(SessionDisconnectEvent event) {
+        log.debug("WebSocket 연결 해제: sessionId={}", event.getSessionId());
+    }
 }

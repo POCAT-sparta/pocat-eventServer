@@ -2,6 +2,7 @@ package sparta.eventserver.domain.notification.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import sparta.eventserver.domain.notification.dto.event.NotificationEvent;
@@ -14,7 +15,7 @@ import tools.jackson.databind.ObjectMapper;
 public class NotificationKafkaConsumer {
 
     private final NotificationRepository notificationRepository;
-//    private final StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper objectMapper;
 
     @KafkaListener(
@@ -31,7 +32,7 @@ public class NotificationKafkaConsumer {
             }
 
             // Redis Pub/Sub 발행 → NotificationRedisSubscriber → WebSocket
-            //stringRedisTemplate.convertAndSend("notification:" + event.getUserId(), message);
+            stringRedisTemplate.convertAndSend("notification:" + event.getUserId(), message);
 
             log.debug("Redis 알림 발행 완료: userId={}, notificationId={}", event.getUserId(), event.getNotificationId());
 
