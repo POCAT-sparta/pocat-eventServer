@@ -1,34 +1,12 @@
 spring:
-  config:
-    import: aws-parameterstore:/pocat/prod/
-
   application:
     name: eventServer
-
-  datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/pocat}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:12345678}
-
   jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
         format_sql: false
         dialect: org.hibernate.dialect.MySQLDialect
-
-  data:
-    redis:
-      password: ${REDIS_PASSWORD}
-      cluster:
-        nodes: ${REDIS_CLUSTER_NODES:redis-1:7001,redis-2:7002,redis-3:7003,redis-4:7004,redis-5:7005,redis-6:7006}
-        max-redirects: 3
-
-
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9094,localhost:9095}
 
 jwt:
   secret: ${JWT_SECRET:}
