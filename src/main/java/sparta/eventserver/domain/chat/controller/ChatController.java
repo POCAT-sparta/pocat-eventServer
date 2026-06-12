@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/ws/api")
 public class ChatController {
 
     private final ChatCommandService chatCommandService;
