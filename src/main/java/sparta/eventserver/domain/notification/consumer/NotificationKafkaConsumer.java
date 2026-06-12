@@ -7,7 +7,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import sparta.eventserver.domain.notification.dto.event.NotificationEvent;
 import sparta.eventserver.domain.notification.repository.NotificationRepository;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Component

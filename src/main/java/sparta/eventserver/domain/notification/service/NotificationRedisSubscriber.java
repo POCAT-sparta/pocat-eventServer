@@ -7,7 +7,7 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import sparta.eventserver.domain.notification.dto.event.NotificationEvent;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Component
