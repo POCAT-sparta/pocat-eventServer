@@ -2,6 +2,7 @@ package sparta.eventserver.global.config;
 
 import java.util.Map;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +26,9 @@ public class DataSourceConfig {
     }
 
     @Bean
-    public DataSource routingDataSource(DataSource masterDataSource, DataSource slaveDataSource) {
+    public DataSource routingDataSource(
+            @Qualifier("masterDataSource") DataSource masterDataSource,
+            @Qualifier("slaveDataSource") DataSource slaveDataSource) {
         RoutingDataSource routingDataSource = new RoutingDataSource();
         routingDataSource.setTargetDataSources(Map.of(
                 RoutingDataSource.MASTER, masterDataSource,
@@ -41,7 +44,7 @@ public class DataSourceConfig {
      */
     @Bean
     @Primary
-    public DataSource dataSource(DataSource routingDataSource) {
+    public DataSource dataSource(@Qualifier("routingDataSource") DataSource routingDataSource) {
         return new LazyConnectionDataSourceProxy(routingDataSource);
     }
 }
