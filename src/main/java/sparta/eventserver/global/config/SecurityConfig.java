@@ -56,8 +56,11 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/ws/chat/**").permitAll()
+                        // 채팅 REST는 JWT 필요 (SockJS 핸드셰이크보다 먼저 매칭되어야 함)
+                        .requestMatchers("/ws/api/**").authenticated()
                         .requestMatchers("/actuator/health").permitAll()
+                        // SockJS 핸드셰이크/트랜스포트(/ws, /ws/info, /ws/{server}/{session}/...) — 인증은 STOMP CONNECT 단계에서 수행
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtUtil, redisTemplate),
